@@ -50,6 +50,25 @@ const changePasswordSchema = z.object({
   newPassword: z.string().min(6, "New password must be at least 6 characters"),
 });
 
+const propertySchema = z.object({
+  title: z
+    .string()
+    .min(10, "Your title should be at least 10 characters long."),
+
+  description: z
+    .string()
+    .min(
+      10,
+      "Please provide a more detailed description (at least 50 characters)."
+    ),
+
+  address: z
+    .string()
+    .min(5, "The address should be at least 5 characters long."),
+
+  price: z.coerce.number().positive("The price must be greater than zero."),
+});
+
 // Validation middleware factory
 const validate = (schema) => {
   return (req, res, next) => {
@@ -59,7 +78,7 @@ const validate = (schema) => {
       next();
     } catch (error) {
       if (error instanceof z.ZodError) {
-        const errors = error.errors.map((err) => ({
+        const errors = JSON.parse(error).map((err) => ({
           field: err.path.join("."),
           message: err.message,
         }));
@@ -232,5 +251,6 @@ module.exports = {
   transactionQuerySchema,
   sanitizeInput,
   validateTradingPair,
-  validateAmount
+  validateAmount,
+  propertySchema,
 };
